@@ -1,0 +1,85 @@
+---
+title: "Kmeans clustering on the Iris dataset"
+author: "Hicham el Bouazzaoui"
+date: "3 maart 2018"
+output: slidy_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Unsupervised learning example
+
+The shinyapp app shows the result of a K-means clustering of the Iris dataset available in Rstudio. 
+
+This example comes from the Machine Learning course week 4 and handles the Unsupervised learning technique. 
+
+k-means clustering alrorithm aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype of the cluster.
+
+## Dataset & inputs
+
+The miniUI package is used to create an interface. The user is able to give the following inputs:
+- Number of clusters: a choice between 1 and 6
+- X attribute: the feature selected for the X axis along which the clustering is plotted
+- Y attribute: the feature selected for the Y axis along which the clustering is plotted
+
+The input is limited, where the user is only able to select the colomns of the Iris dataset. 
+
+The output is a cluster plot where the number of clusters of the Iris dataset are plotted, as given as input. 
+
+## Calculation
+
+The calculation is done in the server.ui part of the Shiny app. 
+Here the training data is created by subsetting the iris dataset. Next the clustering is carried out where the kmeans algorithm is called with the trainingset and numer of centers as input. 
+
+
+```{r, echo = TRUE}
+
+kmeans_ex <- function(input){
+  trainingData <- reactive({
+    input[,c(1,2)]
+  })
+  
+  clusters <- reactive({
+    kmeans(trainingData(),centers = input$clusters)
+  })
+  
+  output$plot1 <- renderPlot({
+    par(mar = c(5.1, 4.1, 1, 0))
+    plot(trainingData(), col = clusters()$cluster, pch = 20, cex = 3)
+    points(clusters()$centers, pch = 4, cex = 4, lwd = 4)
+  })
+}
+
+```
+
+The core of the function works as follows:
+```{r, echo = TRUE}
+
+kmeans_ex <- function(data, nr_clusters){
+  trainingData <- data[,c(1,2)]
+  
+  clusters <- kmeans(trainingData, centers = nr_clusters)
+  
+  par(mar = c(5.1, 4.1, 1, 0))
+  plot(trainingData, col = clusters$cluster, pch = 20, cex = 3)
+  points(clusters$centers, pch = 4, cex = 4, lwd = 4)
+
+}
+```
+
+The result is plotted in a clusterplot.
+
+```{r, echo=TRUE}
+
+kmeans_ex(iris, 3)
+
+```
+
+## Conclusion
+
+By using the app, the user is able to select different features and number of cluster to visialize the Kmeans clustering of the dataset. 
+
+Thanks!
+
